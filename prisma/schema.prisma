@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  favorites    Favorite[]
+}
+
+model Listing {
+  id              String     @id @default(cuid())
+  slug            String     @unique
+  title           String
+  city            String
+  postalCode      String
+  kind            String
+  rooms           Float
+  livingAreaM2    Int
+  priceEur        Int
+  description     String
+  isNew           Boolean    @default(false)
+  lat             Float?
+  lng             Float?
+  coverImageUrl   String?
+  createdAt       DateTime   @default(now())
+  favorites       Favorite[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+}

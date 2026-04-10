@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Buildeo design tokens — portal-style clarity, petrol accent (distinct from IS24) */
+:root {
+  --bd-page: #f4f4f5;
+  --bd-hero-tint: color-mix(in srgb, #0f766e 8%, white);
+  --bd-map-pattern: #d4d4d8;
+  /* Header „Menü“ trigger — ghost style, matches bd-primary tints (see @theme dark overrides) */
+  --bd-menu-trigger-fg: #3f3f46;
+  --bd-menu-trigger-hover-bg: color-mix(in srgb, #0f766e 12%, transparent);
+  /* Transparent header on hero: light icon/label on photo */
+  --bd-menu-trigger-overlay-fg: #ffffff;
+  --bd-menu-trigger-overlay-hover-bg: rgb(255 255 255 / 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bd-page: #09090b;
+    --bd-hero-tint: color-mix(in srgb, #2dd4bf 10%, #09090b);
+    --bd-map-pattern: #3f3f46;
+    --bd-menu-trigger-fg: #d4d4d8;
+    --bd-menu-trigger-hover-bg: color-mix(in srgb, #2dd4bf 14%, transparent);
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --color-bd-primary: #0f766e;
+  --color-bd-primary-hover: #0d9488;
+  --color-bd-primary-fg: #ffffff;
+  --color-bd-on-primary-muted: #ecfdf5;
+  --radius-bd-sm: 0.5rem;
+  --radius-bd-md: 0.75rem;
+  --radius-bd-lg: 1rem;
+  --radius-bd-xl: 1.25rem;
+  --shadow-bd-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.06);
+  --shadow-bd-float: 0 8px 24px rgb(0 0 0 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme inline {
+    --color-bd-primary: #2dd4bf;
+    --color-bd-primary-hover: #5eead4;
+    --color-bd-primary-fg: #042f2e;
+    --color-bd-on-primary-muted: #134e4a;
+    --shadow-bd-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 4px 12px rgb(0 0 0 / 0.35);
+    --shadow-bd-float: 0 12px 32px rgb(0 0 0 / 0.45);
+  }
+}
+
+body {
+  background-color: var(--bd-page);
+  color: #18181b;
+  font-family: var(--font-sans);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #fafafa;
+  }
+}
+
+@keyframes bd-hero-ken {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.06);
+  }
+}
+
+.hero-ken-burns {
+  animation: bd-hero-ken 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ken-burns {
+    animation: none;
+  }
+}
+
