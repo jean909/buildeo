@@ -12,7 +12,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "" ? 1 : 0.7,
   }));
 
-  const slugs = await getAllListingSlugs();
+  let slugs: string[] = [];
+  try {
+    slugs = await getAllListingSlugs();
+  } catch {
+    /* Build-time / offline: skip listing URLs until DB is reachable at runtime. */
+  }
   for (const slug of slugs) {
     entries.push({
       url: `${base}/inserat/${slug}`,

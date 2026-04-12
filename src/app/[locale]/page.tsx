@@ -15,7 +15,12 @@ export default async function HomePage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations("home");
-  const featured = await getFeaturedListings(3);
+  let featured: Awaited<ReturnType<typeof getFeaturedListings>> = [];
+  try {
+    featured = await getFeaturedListings(3);
+  } catch {
+    /* Vercel build often cannot reach DB; homepage still builds. */
+  }
 
   return (
     <>

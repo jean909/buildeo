@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageBreadcrumbs } from "@/components/layout/page-breadcrumbs";
 import { auth } from "@/auth";
-import { getAllListingSlugs, getListingBySlug, getListingDetailBySlug } from "@/lib/listings-repo";
+import { getListingBySlug, getListingDetailBySlug } from "@/lib/listings-repo";
 import { notFound } from "next/navigation";
 import { ListingContactRoot, type ContactFormLabels } from "./components/listing-contact-root";
 import { ListingMobileBar } from "./components/listing-mobile-bar";
@@ -16,10 +16,8 @@ type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-export async function generateStaticParams() {
-  const slugs = await getAllListingSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
+/** Vercel build cannot reach Supabase direct DB; avoid Prisma at build time. */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
