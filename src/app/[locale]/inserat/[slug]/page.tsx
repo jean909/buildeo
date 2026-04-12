@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageBreadcrumbs } from "@/components/layout/page-breadcrumbs";
 import { auth } from "@/auth";
@@ -10,6 +9,7 @@ import { ListingMobileBar } from "./components/listing-mobile-bar";
 import { ListingShareButton } from "./components/listing-share-button";
 import { ListingStickyAside } from "./components/listing-sticky-aside";
 import { ListingMapPanel } from "./components/listing-map-panel";
+import { ListingCoverMedia } from "@/components/listing/listing-cover-media";
 import { MapPlaceholder } from "@/components/search/map-placeholder";
 
 type Props = {
@@ -131,7 +131,7 @@ export default async function ListingPage({ params }: Props) {
 
             <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-xl bg-gradient-to-br from-zinc-200 to-zinc-300 shadow-[var(--shadow-bd-card)] dark:from-zinc-800 dark:to-zinc-900">
               {listing.coverImageUrl ? (
-                <Image
+                <ListingCoverMedia
                   src={listing.coverImageUrl}
                   alt={listing.title}
                   fill

@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { ListingCoverMedia } from "@/components/listing/listing-cover-media";
 import type { Listing } from "@/types/listing";
 import { FavoriteToggle } from "@/components/merkliste/favorite-toggle";
 
@@ -48,12 +48,12 @@ export function ListingCardBody({
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-900">
           {listing.coverImageUrl ? (
-            <Image
+            <ListingCoverMedia
               src={listing.coverImageUrl}
               alt={listing.title}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
+              className="transition duration-500 ease-out group-hover:scale-[1.04]"
             />
           ) : null}
           <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2 py-1 text-xs font-bold text-bd-primary shadow-sm dark:bg-zinc-950/95 dark:text-teal-300">

@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { allocateUniqueListingSlug } from "@/lib/listing-slug";
@@ -11,25 +12,37 @@ const MAX = {
   url: 500,
 } as const;
 
-function num(v: unknown, min: number, max: number, int = false): number | null {
-  const n = typeof v === "string" ? Number.parseFloat(v) : typeof v === "number" ? v : NaN;
+function parseNumInput(v: unknown, int: boolean): number | null {
+  if (typeof v === "number" && Number.isFinite(v)) {
+    const x = int ? Math.trunc(v) : v;
+    return x;
+  }
+  if (typeof v !== "string") return null;
+  const s = v.trim().replace(/\s/g, "").replace(",", ".");
+  if (s === "") return null;
+  const n = int ? Number.parseInt(s, 10) : Number.parseFloat(s);
   if (!Number.isFinite(n)) return null;
-  const x = int ? Math.trunc(n) : n;
-  if (x < min || x > max) return null;
-  return x;
+  return int ? Math.trunc(n) : n;
+}
+
+function numInRange(v: unknown, min: number, max: number, int: boolean): number | null {
+  const n = parseNumInput(v, int);
+  if (n == null) return null;
+  if (n < min || n > max) return null;
+  return n;
 }
 
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "unauthorized" as const }, { status: 401 });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "invalid" }, { status: 400 });
+    return NextResponse.json({ error: "invalid" as const }, { status: 400 });
   }
 
   const title = typeof body.title === "string" ? body.title.trim().slice(0, MAX.title) : "";
@@ -40,9 +53,9 @@ export async function POST(req: Request) {
   const kindRaw = typeof body.kind === "string" ? body.kind.trim() : "";
   const kind = kindRaw === "buy" || kindRaw === "kaufen" ? "buy" : "rent";
 
-  const rooms = num(body.rooms, 0.5, 20, false);
-  const livingAreaM2 = num(body.livingAreaM2, 5, 50_000, true);
-  const priceEur = num(body.priceEur, 1, 200_000_000, true);
+  const rooms = numInRange(body.rooms, 0.5, 20, false);
+  const livingAreaM2 = numInRange(body.livingAreaM2, 5, 50_000, true);
+  const priceEur = numInRange(body.priceEur, 1, 200_000_000, true);
 
   if (title.length < 3 || city.length < 2 || postalCode.length < 2 || description.length < 10) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
@@ -51,44 +64,80 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
+  const coverRaw = typeof body.coverImageUrl === "string" ? body.coverImageUrl.trim() : "";
   let coverImageUrl: string | null = null;
-  if (typeof body.coverImageUrl === "string" && body.coverImageUrl.trim()) {
-    const u = body.coverImageUrl.trim().slice(0, MAX.url);
-    if (/^https:\/\//i.test(u)) coverImageUrl = u;
+  if (coverRaw) {
+    const u = coverRaw.slice(0, MAX.url);
+    if (/^https:\/\//i.test(u)) {
+      coverImageUrl = u;
+    } else {
+      return NextResponse.json({ error: "cover_invalid" }, { status: 400 });
+    }
+  }
+
+  const latRaw = body.lat;
+  const lngRaw = body.lng;
+  const latEmpty =
+    latRaw === undefined || latRaw === null || (typeof latRaw === "string" && latRaw.trim() === "");
+  const lngEmpty =
+    lngRaw === undefined || lngRaw === null || (typeof lngRaw === "string" && lngRaw.trim() === "");
+  if (latEmpty !== lngEmpty) {
+    return NextResponse.json({ error: "coords_partial" }, { status: 400 });
   }
 
   let lat: number | null = null;
   let lng: number | null = null;
-  const latN = num(body.lat, -90, 90, false);
-  const lngN = num(body.lng, -180, 180, false);
-  if (latN != null && lngN != null) {
+  if (!latEmpty && !lngEmpty) {
+    const latN = numInRange(latRaw, -90, 90, false);
+    const lngN = numInRange(lngRaw, -180, 180, false);
+    if (latN == null || lngN == null) {
+      return NextResponse.json({ error: "validation" }, { status: 400 });
+    }
     lat = latN;
     lng = lngN;
   }
 
   const isNew = body.isNew === true || body.isNew === "true" || body.isNew === "1";
 
-  const slug = await allocateUniqueListingSlug(title);
+  let slug = await allocateUniqueListingSlug(title);
 
-  const row = await prisma.listing.create({
-    data: {
-      slug,
-      title,
-      city,
-      postalCode,
-      kind,
-      rooms,
-      livingAreaM2,
-      priceEur,
-      description,
-      isNew,
-      lat,
-      lng,
-      coverImageUrl,
-      ownerId: session.user.id,
-    },
-    select: { slug: true },
-  });
+  const data = {
+    slug,
+    title,
+    city,
+    postalCode,
+    kind,
+    rooms,
+    livingAreaM2,
+    priceEur,
+    description,
+    isNew,
+    lat,
+    lng,
+    coverImageUrl,
+    ownerId: session.user.id,
+  };
 
-  return NextResponse.json({ ok: true, slug: row.slug });
+  try {
+    const row = await prisma.listing.create({
+      data,
+      select: { slug: true },
+    });
+    return NextResponse.json({ ok: true as const, slug: row.slug });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      try {
+        slug = await allocateUniqueListingSlug(`${title}-${Date.now().toString(36)}`);
+        const row = await prisma.listing.create({
+          data: { ...data, slug },
+          select: { slug: true },
+        });
+        return NextResponse.json({ ok: true as const, slug: row.slug });
+      } catch {
+        return NextResponse.json({ error: "slug_conflict" }, { status: 409 });
+      }
+    }
+    console.error("[api/listings] create", e);
+    return NextResponse.json({ error: "server" as const }, { status: 500 });
+  }
 }
