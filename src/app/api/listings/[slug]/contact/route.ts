@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { notifyOwnerContactInquiry } from "@/lib/email/notify-owner-contact";
 import { prisma } from "@/lib/prisma";
 
 const MAX_NAME = 120;
@@ -41,7 +42,13 @@ export async function POST(req: Request, { params }: Params) {
 
   const listing = await prisma.listing.findUnique({
     where: { slug },
-    select: { id: true, ownerId: true },
+    select: {
+      id: true,
+      ownerId: true,
+      title: true,
+      slug: true,
+      owner: { select: { email: true } },
+    },
   });
 
   if (!listing) {
@@ -65,6 +72,22 @@ export async function POST(req: Request, { params }: Params) {
       message,
     },
   });
+
+  const ownerEmail = listing.owner?.email?.trim();
+  if (ownerEmail) {
+    try {
+      await notifyOwnerContactInquiry({
+        ownerEmail,
+        listingTitle: listing.title,
+        listingSlug: listing.slug,
+        fromName,
+        fromEmail,
+        message,
+      });
+    } catch (e) {
+      console.error("[contact] owner email notify", e);
+    }
+  }
 
   return NextResponse.json({ ok: true });
 }
