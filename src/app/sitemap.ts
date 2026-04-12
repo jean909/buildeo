@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllListingSlugs } from "@/lib/listings-repo";
+import { shouldSkipOptionalDbReadsDuringPrerender } from "@/lib/is-next-build-phase";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
@@ -25,10 +26,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   let slugs: string[] = [];
-  try {
-    slugs = await getAllListingSlugs();
-  } catch {
-    /* Build-time / offline: skip listing URLs until DB is reachable at runtime. */
+  if (!shouldSkipOptionalDbReadsDuringPrerender()) {
+    try {
+      slugs = await getAllListingSlugs();
+    } catch {
+      /* Offline / DB down */
+    }
   }
   for (const slug of slugs) {
     entries.push({

@@ -4,7 +4,11 @@ import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useState, type FormEvent } from "react";
 
-export function NewListingForm() {
+type FormProps = {
+  defaultKind: "rent" | "buy";
+};
+
+export function NewListingForm({ defaultKind }: FormProps) {
   const t = useTranslations("listingNew");
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +102,7 @@ export function NewListingForm() {
         <label htmlFor="nl-kind" className={label}>
           {t("kind")}
         </label>
-        <select id="nl-kind" name="kind" className={input} defaultValue="rent">
+        <select id="nl-kind" name="kind" className={input} defaultValue={defaultKind} key={defaultKind}>
           <option value="rent">{t("kindRent")}</option>
           <option value="buy">{t("kindBuy")}</option>
         </select>

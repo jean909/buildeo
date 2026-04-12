@@ -51,8 +51,8 @@ export function MobileNavDrawer() {
 
   const mainItems: NavItem[] = [
     { href: "/suche", label: t("drawerSearch") },
-    { href: "/suche?typ=kaufen", label: t("drawerSell") },
-    { href: "/suche?typ=mieten", label: t("drawerRent") },
+    { href: "/inserat/neu?kind=buy", label: t("drawerSell") },
+    { href: "/inserat/neu?kind=rent", label: t("drawerRent") },
     { href: "/suche", label: t("drawerModernize") },
     { href: "/suche", label: t("drawerFinance") },
     { href: "/suche", label: t("drawerMove") },

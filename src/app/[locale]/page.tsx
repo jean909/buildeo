@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ListingCard } from "@/components/listing/listing-card";
 import { getFeaturedListings } from "@/lib/listings-repo";
+import { shouldSkipOptionalDbReadsDuringPrerender } from "@/lib/is-next-build-phase";
 import { FlipoKiBanner } from "@/components/flipo/flipo-ki-banner";
 import { HomeServiceCards } from "@/components/home/home-service-cards";
 import { SearchHero } from "./components/search-hero";
@@ -16,10 +17,12 @@ export default async function HomePage({ params }: Props) {
 
   const t = await getTranslations("home");
   let featured: Awaited<ReturnType<typeof getFeaturedListings>> = [];
-  try {
-    featured = await getFeaturedListings(3);
-  } catch {
-    /* Vercel build often cannot reach DB; homepage still builds. */
+  if (!shouldSkipOptionalDbReadsDuringPrerender()) {
+    try {
+      featured = await getFeaturedListings(3);
+    } catch {
+      /* DB unreachable at runtime */
+    }
   }
 
   return (
