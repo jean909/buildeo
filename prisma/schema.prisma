@@ -9,17 +9,18 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  name         String?
-  passwordHash String
-  createdAt    DateTime   @default(now())
-  favorites    Favorite[]
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  passwordHash   String
+  createdAt      DateTime         @default(now())
+  favorites      Favorite[]
+  ownedListings  Listing[]
 }
 
 model Listing {
-  id              String     @id @default(cuid())
-  slug            String     @unique
+  id              String            @id @default(cuid())
+  slug            String            @unique
   title           String
   city            String
   postalCode      String
@@ -28,12 +29,28 @@ model Listing {
   livingAreaM2    Int
   priceEur        Int
   description     String
-  isNew           Boolean    @default(false)
+  isNew           Boolean           @default(false)
   lat             Float?
   lng             Float?
   coverImageUrl   String?
-  createdAt       DateTime   @default(now())
+  createdAt       DateTime          @default(now())
+  ownerId         String?
+  owner           User?             @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   favorites       Favorite[]
+  contactInquiries ContactInquiry[]
+}
+
+model ContactInquiry {
+  id         String    @id @default(cuid())
+  listingId  String
+  listing    Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  fromName   String
+  fromEmail  String
+  message    String
+  createdAt  DateTime  @default(now())
+  readAt     DateTime?
+
+  @@index([listingId])
 }
 
 model Favorite {

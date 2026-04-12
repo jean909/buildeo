@@ -7,6 +7,7 @@ import { useHeaderAppearance } from "@/components/layout/header-appearance-conte
 
 export function AuthNav() {
   const t = useTranslations("auth");
+  const tNav = useTranslations("nav");
   const { data: session, status } = useSession();
   const appearance = useHeaderAppearance();
   const ov = appearance === "overlay";
@@ -26,6 +27,16 @@ export function AuthNav() {
         >
           {session.user.name || session.user.email}
         </span>
+        <Link
+          href="/anfragen"
+          className={`rounded-lg px-3 py-2 text-sm font-medium ${
+            ov
+              ? "text-white hover:bg-white/15"
+              : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          }`}
+        >
+          {tNav("inquiries")}
+        </Link>
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}

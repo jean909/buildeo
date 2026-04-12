@@ -1,12 +1,15 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import type { Listing } from "@/types/listing";
 import { ListingContactTrigger } from "./listing-contact-trigger";
 
 type Props = {
   listing: Listing;
+  contactEnabled: boolean;
+  isOwner: boolean;
 };
 
-export async function ListingStickyAside({ listing }: Props) {
+export async function ListingStickyAside({ listing, contactEnabled, isOwner }: Props) {
   const t = await getTranslations("listing");
   const isRent = listing.kind === "rent";
   const priceLabel = isRent ? t("rent") : t("price");
@@ -27,9 +30,22 @@ export async function ListingStickyAside({ listing }: Props) {
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
         {listing.postalCode} {listing.city}
       </p>
-      <ListingContactTrigger className="mt-6 w-full rounded-lg bg-bd-primary py-3 text-sm font-semibold text-bd-primary-fg shadow-sm transition hover:bg-bd-primary-hover">
-        {t("contact")}
-      </ListingContactTrigger>
+      {isOwner ? (
+        <Link
+          href="/anfragen"
+          className="mt-6 flex w-full items-center justify-center rounded-lg bg-bd-primary py-3 text-sm font-semibold text-bd-primary-fg shadow-sm transition hover:bg-bd-primary-hover"
+        >
+          {t("ownerInquiriesCta")}
+        </Link>
+      ) : contactEnabled ? (
+        <ListingContactTrigger className="mt-6 w-full rounded-lg bg-bd-primary py-3 text-sm font-semibold text-bd-primary-fg shadow-sm transition hover:bg-bd-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
+          {t("contact")}
+        </ListingContactTrigger>
+      ) : (
+        <p className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-400">
+          {t("contactUnavailable")}
+        </p>
+      )}
       <p className="mt-4 text-xs leading-relaxed text-zinc-500 dark:text-zinc-500">
         {t("asideDisclaimer")}
       </p>

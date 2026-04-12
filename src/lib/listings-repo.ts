@@ -127,9 +127,17 @@ export async function listListings(filters: SearchFilterState): Promise<ListingD
   });
 }
 
-export async function getListingBySlug(slug: string) {
+export async function getListingDetailBySlug(
+  slug: string,
+): Promise<{ listing: ListingDto; ownerId: string | null } | undefined> {
   const row = await prisma.listing.findUnique({ where: { slug } });
-  return row ? mapDbListing(row) : undefined;
+  if (!row) return undefined;
+  return { listing: mapDbListing(row), ownerId: row.ownerId };
+}
+
+export async function getListingBySlug(slug: string) {
+  const d = await getListingDetailBySlug(slug);
+  return d?.listing;
 }
 
 export async function getFeaturedListings(limit: number) {

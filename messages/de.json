@@ -26,6 +26,7 @@
   "nav": {
     "search": "Suche",
     "favorites": "Merkliste",
+    "inquiries": "Anfragen",
     "login": "Anmelden",
     "register": "Registrieren",
     "listProperty": "Inserat erstellen",
@@ -112,7 +113,7 @@
   },
   "search": {
     "title": "Immobiliensuche",
-    "subtitle": "Filter, Freitext und Ergebnisliste – Merkliste und Kontaktformular sind aktiv, Backend folgt.",
+    "subtitle": "Filter, Freitext und Ergebnisliste – Merkliste mit Account, Kontaktanfragen an den Inserats-Anbieter.",
     "rent": {
       "pageTitle": "{count} Mietangebote",
       "pageSubtitle": "Klassische Filter, Schnell-Pills und erweiterte Suche (Miete). Merkmale per Stichwort in Titel/Beschreibung – Demo-Bestand.",
@@ -195,7 +196,10 @@
     "favoriteAdd": "Zur Merkliste hinzufügen",
     "favoriteRemove": "Von Merkliste entfernen",
     "contact": "Anbieter kontaktieren",
-    "asideDisclaimer": "Demo-Inserat – Kontakt und Courtage folgen mit echtem Backend.",
+    "ownerInquiriesCta": "Anfragen zu meinen Inseraten",
+    "ownerInquiriesShort": "Anfragen",
+    "contactUnavailable": "Für dieses Inserat ist kein Anbieter-Konto hinterlegt – Kontakt nicht möglich.",
+    "asideDisclaimer": "Anfragen werden gespeichert; der Anbieter sieht sie unter „Anfragen“ nach Login. Courtage/Haftung: eigenständige Vereinbarung.",
     "sectionFacts": "Angaben zum Objekt",
     "sectionLocation": "Lage",
     "mapApproximate": "Ungefähre Position auf der Karte (Orientierung).",
@@ -214,9 +218,22 @@
       "message": "Nachricht",
       "submit": "Absenden",
       "close": "Schließen",
-      "success": "Danke! Deine Anfrage würde an den Anbieter gehen – Versand aktivieren wir mit Backend.",
-      "hint": "Demo: Es wird nichts übertragen."
+      "success": "Danke! Deine Nachricht wurde gespeichert. Der Anbieter kann dir unter der angegebenen E-Mail antworten.",
+      "hint": "Deine Angaben werden an Buildeo übermittelt und dem Anbieter dieses Inserats angezeigt (nicht öffentlich).",
+      "sending": "Wird gesendet …",
+      "errorGeneric": "Senden fehlgeschlagen. Bitte später erneut versuchen.",
+      "errorNoOwner": "Dieses Inserat hat keinen verknüpften Anbieter.",
+      "errorOwnListing": "Das ist dein eigenes Inserat – hier kannst du keine Anfrage stellen.",
+      "backToSearch": "← Zur Suche"
     }
+  },
+  "inquiries": {
+    "metaTitle": "Anfragen",
+    "metaDescription": "Kontaktanfragen zu deinen Inseraten bei Buildeo.",
+    "title": "Anfragen",
+    "subtitle": "Nachrichten von Interessenten zu Inseraten, bei denen du als Anbieter hinterlegt bist.",
+    "empty": "Noch keine Anfragen.",
+    "goSearch": "Inserate durchsuchen"
   },
   "merkliste": {
     "metaTitle": "Merkliste",

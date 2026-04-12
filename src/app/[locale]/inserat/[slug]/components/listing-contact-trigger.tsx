@@ -1,6 +1,6 @@
 "use client";
 
-import { useOpenListingContact } from "./listing-contact-root";
+import { useListingContact } from "./listing-contact-root";
 
 type Props = {
   className?: string;
@@ -8,9 +8,9 @@ type Props = {
 };
 
 export function ListingContactTrigger({ className, children }: Props) {
-  const open = useOpenListingContact();
+  const { open, enabled } = useListingContact();
   return (
-    <button type="button" onClick={open} className={className}>
+    <button type="button" disabled={!enabled} onClick={open} className={className}>
       {children}
     </button>
   );

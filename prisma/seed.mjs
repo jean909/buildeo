@@ -91,7 +91,7 @@ const listings = [
 
 async function main() {
   const passwordHash = await bcrypt.hash("buildeo-demo", 12);
-  await prisma.user.upsert({
+  const demoUser = await prisma.user.upsert({
     where: { email: "demo@buildeo.de" },
     update: { passwordHash, name: "Demo Nutzer" },
     create: {
@@ -117,6 +117,7 @@ async function main() {
         lat: l.lat,
         lng: l.lng,
         coverImageUrl: l.coverImageUrl,
+        ownerId: demoUser.id,
       },
       create: {
         slug: l.slug,
@@ -132,6 +133,7 @@ async function main() {
         lat: l.lat,
         lng: l.lng,
         coverImageUrl: l.coverImageUrl,
+        ownerId: demoUser.id,
       },
     });
   }

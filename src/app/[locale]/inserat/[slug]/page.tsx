@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageBreadcrumbs } from "@/components/layout/page-breadcrumbs";
-import { getAllListingSlugs, getListingBySlug } from "@/lib/listings-repo";
+import { auth } from "@/auth";
+import { getAllListingSlugs, getListingBySlug, getListingDetailBySlug } from "@/lib/listings-repo";
 import { notFound } from "next/navigation";
 import { ListingContactRoot, type ContactFormLabels } from "./components/listing-contact-root";
 import { ListingMobileBar } from "./components/listing-mobile-bar";
@@ -61,10 +62,15 @@ export default async function ListingPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const listing = await getListingBySlug(slug);
-  if (!listing) {
+  const detail = await getListingDetailBySlug(slug);
+  if (!detail) {
     notFound();
   }
+
+  const { listing, ownerId } = detail;
+  const session = await auth();
+  const isOwner = Boolean(session?.user?.id && ownerId && session.user.id === ownerId);
+  const contactEnabled = Boolean(ownerId) && !isOwner;
 
   const t = await getTranslations("listing");
   const tSearch = await getTranslations("search");
@@ -88,6 +94,11 @@ export default async function ListingPage({ params }: Props) {
     close: t("contactForm.close"),
     success: t("contactForm.success"),
     hint: t("contactForm.hint"),
+    sending: t("contactForm.sending"),
+    errorGeneric: t("contactForm.errorGeneric"),
+    errorNoOwner: t("contactForm.errorNoOwner"),
+    errorOwnListing: t("contactForm.errorOwnListing"),
+    backToSearch: t("contactForm.backToSearch"),
   };
 
   return (
@@ -95,6 +106,7 @@ export default async function ListingPage({ params }: Props) {
       listingSlug={listing.slug}
       listingTitle={listing.title}
       labels={contactLabels}
+      contactEnabled={contactEnabled}
     >
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-8 sm:px-6 sm:pb-10 lg:pb-12">
         <PageBreadcrumbs
@@ -200,13 +212,19 @@ export default async function ListingPage({ params }: Props) {
 
           <div className="hidden lg:block">
             <div className="sticky top-20">
-              <ListingStickyAside listing={listing} />
+              <ListingStickyAside listing={listing} contactEnabled={contactEnabled} isOwner={isOwner} />
             </div>
           </div>
         </div>
       </main>
 
-      <ListingMobileBar priceLabel={priceLabel} formatted={formatted} contactLabel={t("contact")} />
+      <ListingMobileBar
+        priceLabel={priceLabel}
+        formatted={formatted}
+        contactLabel={t("contact")}
+        ownerInquiriesLabel={t("ownerInquiriesShort")}
+        isOwner={isOwner}
+      />
     </ListingContactRoot>
   );
 }

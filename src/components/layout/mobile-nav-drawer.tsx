@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useHeaderAppearance } from "@/components/layout/header-appearance-context";
@@ -20,6 +21,7 @@ type NavItem = { href: string; label: string };
 export function MobileNavDrawer() {
   const t = useTranslations("nav");
   const tFooter = useTranslations("footer");
+  const { data: session } = useSession();
   const appearance = useHeaderAppearance();
   const ov = appearance === "overlay";
   const [open, setOpen] = useState(false);
@@ -55,6 +57,7 @@ export function MobileNavDrawer() {
     { href: "/suche", label: t("drawerFinance") },
     { href: "/suche", label: t("drawerMove") },
     { href: "/merkliste", label: t("favorites") },
+    ...(session?.user ? [{ href: "/anfragen", label: t("inquiries") } satisfies NavItem] : []),
     { href: "/suche", label: t("listProperty") },
     { href: "/#flipo-heading", label: t("drawerFlipo") },
   ];

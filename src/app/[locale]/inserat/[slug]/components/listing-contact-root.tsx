@@ -8,6 +8,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { Link } from "@/i18n/navigation";
 
 export type ContactFormLabels = {
   title: string;
@@ -18,31 +19,50 @@ export type ContactFormLabels = {
   close: string;
   success: string;
   hint: string;
+  sending: string;
+  errorGeneric: string;
+  errorNoOwner: string;
+  errorOwnListing: string;
+  backToSearch: string;
 };
 
-const ContactOpenContext = createContext<(() => void) | null>(null);
+type ListingContactContextValue = {
+  open: () => void;
+  enabled: boolean;
+};
 
-export function useOpenListingContact() {
-  const fn = useContext(ContactOpenContext);
-  if (!fn) {
-    throw new Error("useOpenListingContact outside ListingContactRoot");
+const ListingContactContext = createContext<ListingContactContextValue | null>(null);
+
+export function useListingContact() {
+  const v = useContext(ListingContactContext);
+  if (!v) {
+    throw new Error("useListingContact outside ListingContactRoot");
   }
-  return fn;
+  return v;
 }
 
 type RootProps = {
   listingSlug: string;
   listingTitle: string;
   labels: ContactFormLabels;
+  contactEnabled: boolean;
   children: ReactNode;
 };
 
-export function ListingContactRoot({ listingSlug, listingTitle, labels, children }: RootProps) {
+export function ListingContactRoot({
+  listingSlug,
+  listingTitle,
+  labels,
+  contactEnabled,
+  children,
+}: RootProps) {
   const [open, setOpen] = useState(false);
-  const openFn = useCallback(() => setOpen(true), []);
+  const openFn = useCallback(() => {
+    if (contactEnabled) setOpen(true);
+  }, [contactEnabled]);
 
   return (
-    <ContactOpenContext.Provider value={openFn}>
+    <ListingContactContext.Provider value={{ open: openFn, enabled: contactEnabled }}>
       {children}
       {open ? (
         <ContactSheet
@@ -52,7 +72,7 @@ export function ListingContactRoot({ listingSlug, listingTitle, labels, children
           onClose={() => setOpen(false)}
         />
       ) : null}
-    </ContactOpenContext.Provider>
+    </ListingContactContext.Provider>
   );
 }
 
@@ -68,11 +88,56 @@ function ContactSheet({
   onClose: () => void;
 }) {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorKey, setErrorKey] = useState<string | null>(null);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSent(true);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const name = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+    const message = String(fd.get("message") ?? "").trim();
+
+    setLoading(true);
+    setErrorKey(null);
+    try {
+      const res = await fetch(`/api/listings/${encodeURIComponent(listingSlug)}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+      let data: { error?: string } = {};
+      try {
+        data = (await res.json()) as { error?: string };
+      } catch {
+        /* ignore */
+      }
+
+      if (!res.ok) {
+        if (data.error === "no_owner") setErrorKey("no_owner");
+        else if (data.error === "own_listing") setErrorKey("own_listing");
+        else setErrorKey("generic");
+        return;
+      }
+
+      setSent(true);
+      form.reset();
+    } catch {
+      setErrorKey("generic");
+    } finally {
+      setLoading(false);
+    }
   }
+
+  const errorText =
+    errorKey === "no_owner"
+      ? labels.errorNoOwner
+      : errorKey === "own_listing"
+        ? labels.errorOwnListing
+        : errorKey === "generic"
+          ? labels.errorGeneric
+          : null;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal>
@@ -102,12 +167,26 @@ function ContactSheet({
         </div>
 
         {sent ? (
-          <p className="mt-8 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200">
-            {labels.success}
-          </p>
+          <div className="mt-8 space-y-4">
+            <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200">
+              {labels.success}
+            </p>
+            <Link
+              href="/suche"
+              onClick={onClose}
+              className="inline-flex text-sm font-semibold text-bd-primary hover:text-bd-primary-hover dark:text-teal-300"
+            >
+              {labels.backToSearch}
+            </Link>
+          </div>
         ) : (
-          <form className="mt-6 flex flex-col gap-4" onSubmit={onSubmit}>
+          <form className="mt-6 flex flex-col gap-4" onSubmit={(e) => void onSubmit(e)}>
             <input type="hidden" name="slug" value={listingSlug} readOnly />
+            {errorText ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+                {errorText}
+              </p>
+            ) : null}
             <div>
               <label htmlFor="ct-name" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                 {labels.name}
@@ -117,7 +196,8 @@ function ContactSheet({
                 name="name"
                 required
                 autoComplete="name"
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
+                disabled={loading}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm disabled:opacity-60 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
               />
             </div>
             <div>
@@ -130,7 +210,8 @@ function ContactSheet({
                 type="email"
                 required
                 autoComplete="email"
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
+                disabled={loading}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm disabled:opacity-60 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
               />
             </div>
             <div>
@@ -142,14 +223,16 @@ function ContactSheet({
                 name="message"
                 required
                 rows={4}
-                className="mt-1 w-full resize-y rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
+                disabled={loading}
+                className="mt-1 w-full resize-y rounded-lg border border-zinc-300 px-3 py-2 text-sm disabled:opacity-60 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
               />
             </div>
             <button
               type="submit"
-              className="mt-2 rounded-lg bg-bd-primary py-3 text-sm font-semibold text-bd-primary-fg hover:bg-bd-primary-hover"
+              disabled={loading}
+              className="mt-2 rounded-lg bg-bd-primary py-3 text-sm font-semibold text-bd-primary-fg hover:bg-bd-primary-hover disabled:opacity-60"
             >
-              {labels.submit}
+              {loading ? labels.sending : labels.submit}
             </button>
           </form>
         )}
