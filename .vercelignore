@@ -1,0 +1,4 @@
+# CLI deploy: do not upload secrets (use Vercel Project → Environment Variables).
+.env
+.env.*
+!.env.example
