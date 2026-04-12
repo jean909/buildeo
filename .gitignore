@@ -34,7 +34,7 @@ yarn-error.log*
 .env*
 !.env.example
 
-# vercel
+# vercel (CLI link + deploy metadata)
 .vercel
 
 # typescript

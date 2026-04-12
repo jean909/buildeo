@@ -3,7 +3,18 @@ import { getAllListingSlugs } from "@/lib/listings-repo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
-  const staticPaths = ["", "/suche", "/merkliste", "/impressum", "/datenschutz", "/agb"];
+  const staticPaths = [
+    "",
+    "/suche",
+    "/merkliste",
+    "/anfragen",
+    "/anmelden",
+    "/registrieren",
+    "/anbieterliste",
+    "/impressum",
+    "/datenschutz",
+    "/agb",
+  ];
 
   const entries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
     url: path === "" ? base : `${base}${path}`,

@@ -71,7 +71,8 @@
       "fabSend": "Senden",
       "fabClose": "Schließen",
       "openAssistant": "Flipo öffnen",
-      "usedAiBadge": "KI-Matching aktiv"
+      "usedAiBadge": "KI-Matching aktiv",
+      "classicSearchLink": "Zur klassischen Suche →"
     },
     "services": {
       "sectionTitle": "Wenn’s drauf ankommt",
@@ -113,7 +114,7 @@
   },
   "search": {
     "title": "Immobiliensuche",
-    "subtitle": "Filter, Freitext und Ergebnisliste – Merkliste mit Account, Kontaktanfragen an den Inserats-Anbieter.",
+    "subtitle": "Filter, Freitext, Karte, Merkliste (mit Account serverseitig) und Kontaktanfragen an den Inserats-Anbieter.",
     "rent": {
       "pageTitle": "{count} Mietangebote",
       "pageSubtitle": "Klassische Filter, Schnell-Pills und erweiterte Suche (Miete). Merkmale per Stichwort in Titel/Beschreibung – Demo-Bestand.",
@@ -239,7 +240,7 @@
     "metaTitle": "Merkliste",
     "metaDescription": "Deine gespeicherten Immobilien bei Buildeo.",
     "title": "Merkliste",
-    "subtitle": "Gespeichert nur in diesem Browser (localStorage). Mit Account und Backend später geräteübergreifend.",
+    "subtitle": "Ohne Account: Merkliste im Browser (localStorage). Mit angemeldetem Konto: serverseitig auf allen Geräten.",
     "empty": "Noch keine Inserate – Herz auf der Suche oder Startseite anklicken.",
     "goSearch": "Zur Suche",
     "loading": "Lade Merkliste …"

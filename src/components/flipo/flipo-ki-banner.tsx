@@ -107,7 +107,7 @@ export function FlipoKiBanner() {
                   href="/suche"
                   className="text-sm font-semibold text-white underline decoration-white/45 underline-offset-4 hover:decoration-white"
                 >
-                  Zur klassischen Suche →
+                  {t("classicSearchLink")}
                 </Link>
               </div>
             </div>
