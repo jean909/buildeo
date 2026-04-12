@@ -87,7 +87,7 @@ export function SiteHeaderClient({ labels }: { labels: SiteHeaderLabels }) {
             <div className="hidden items-center gap-2 sm:flex">
               <AuthNav />
               <Link
-                href="/suche"
+                href="/inserat/neu"
                 className={`rounded-lg px-3 py-2 text-sm font-semibold shadow-sm transition ${
                   appearance === "overlay"
                     ? "bg-white text-zinc-900 hover:bg-white/90"

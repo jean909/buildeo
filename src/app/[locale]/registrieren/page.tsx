@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 import { Link, useRouter } from "@/i18n/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { safeCallbackPathFromWindow } from "@/lib/safe-callback-path";
 
 export default function RegistrierenPage() {
   const t = useTranslations("auth");
@@ -13,6 +14,11 @@ export default function RegistrierenPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [signInHref, setSignInHref] = useState("/anmelden");
+
+  useEffect(() => {
+    setSignInHref(`/anmelden${window.location.search}`);
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,7 +50,7 @@ export default function RegistrierenPage() {
         setPending(false);
         return;
       }
-      router.push("/");
+      router.push(safeCallbackPathFromWindow());
       router.refresh();
     } catch {
       setError(t("registerError"));
@@ -112,7 +118,7 @@ export default function RegistrierenPage() {
 
       <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
         {t("hasAccount")}{" "}
-        <Link href="/anmelden" className="font-semibold text-bd-primary dark:text-teal-300">
+        <Link href={signInHref} className="font-semibold text-bd-primary dark:text-teal-300">
           {t("signIn")}
         </Link>
       </p>

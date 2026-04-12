@@ -171,11 +171,12 @@
     "filterRoomsPlaceholder": "z. B. 2",
     "filterApply": "Filter anwenden",
     "alert": {
-      "title": "Suchauftrag (Demnächst per E-Mail)",
-      "body": "Trage deine E-Mail ein – mit Backend speichern wir deine Suche und benachrichtigen dich bei neuen Treffern.",
+      "title": "Suchauftrag",
+      "body": "E-Mail eintragen – wir speichern deine aktuelle Filter-URL (Query-Parameter). E-Mail-Benachrichtigung bei neuen Treffern kann später angebunden werden.",
       "emailPlaceholder": "name@beispiel.de",
-      "submit": "Benachrichtigen",
-      "thanks": "Danke! Die Speicherung aktivieren wir mit dem Backend."
+      "submit": "Speichern",
+      "thanks": "Danke! Deine E-Mail und Suche sind gespeichert.",
+      "error": "Speichern fehlgeschlagen. Bitte erneut versuchen."
     },
     "map": {
       "title": "Kartenansicht",
@@ -184,6 +185,30 @@
       "tokenHint": "Lege NEXT_PUBLIC_MAPBOX_TOKEN in .env an, um die interaktive Karte zu aktivieren.",
       "loading": "Karte wird geladen …"
     }
+  },
+  "listingNew": {
+    "metaTitle": "Inserat erstellen",
+    "metaDescription": "Neues Immobilien-Inserat bei Buildeo anlegen.",
+    "pageTitle": "Inserat erstellen",
+    "pageSubtitle": "Nach dem Speichern bist du als Anbieter verknüpft – Kontaktanfragen landen unter „Anfragen“.",
+    "title": "Titel",
+    "city": "Ort",
+    "postalCode": "PLZ",
+    "kind": "Angebot",
+    "kindRent": "Miete",
+    "kindBuy": "Kauf",
+    "rooms": "Zimmer",
+    "livingArea": "Wohnfläche (m²)",
+    "priceEur": "Preis (EUR, Kaltmiete oder Kaufpreis)",
+    "description": "Beschreibung",
+    "coverUrl": "Titelbild-URL (https, optional)",
+    "latOptional": "Breitengrad (optional)",
+    "lngOptional": "Längengrad (optional)",
+    "isNew": "Als Neu-/Erstbezug kennzeichnen",
+    "submit": "Inserat veröffentlichen",
+    "cancel": "Abbrechen",
+    "errorAuth": "Sitzung abgelaufen – bitte erneut anmelden.",
+    "errorSave": "Inserat konnte nicht gespeichert werden. Angaben prüfen und erneut versuchen."
   },
   "listing": {
     "roomsShort": "Zi.",

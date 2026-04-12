@@ -58,7 +58,7 @@ export function MobileNavDrawer() {
     { href: "/suche", label: t("drawerMove") },
     { href: "/merkliste", label: t("favorites") },
     ...(session?.user ? [{ href: "/anfragen", label: t("inquiries") } satisfies NavItem] : []),
-    { href: "/suche", label: t("listProperty") },
+    { href: "/inserat/neu", label: t("listProperty") },
     { href: "/#flipo-heading", label: t("drawerFlipo") },
   ];
 

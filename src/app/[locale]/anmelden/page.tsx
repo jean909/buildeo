@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 import { Link, useRouter } from "@/i18n/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { safeCallbackPathFromWindow } from "@/lib/safe-callback-path";
 
 export default function AnmeldenPage() {
   const t = useTranslations("auth");
@@ -12,6 +13,11 @@ export default function AnmeldenPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [registerHref, setRegisterHref] = useState("/registrieren");
+
+  useEffect(() => {
+    setRegisterHref(`/registrieren${window.location.search}`);
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,7 +33,7 @@ export default function AnmeldenPage() {
       setError(t("signInError"));
       return;
     }
-    router.push("/");
+    router.push(safeCallbackPathFromWindow());
     router.refresh();
   }
 
@@ -77,7 +83,7 @@ export default function AnmeldenPage() {
 
       <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
         {t("noAccount")}{" "}
-        <Link href="/registrieren" className="font-semibold text-bd-primary dark:text-teal-300">
+        <Link href={registerHref} className="font-semibold text-bd-primary dark:text-teal-300">
           {t("register")}
         </Link>
       </p>

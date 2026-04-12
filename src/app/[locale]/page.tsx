@@ -34,7 +34,7 @@ export default async function HomePage({ params }: Props) {
           <p className="mt-3 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">{t("heroSubtitle")}</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/suche"
+              href="/inserat/neu"
               className="rounded-lg border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 shadow-sm hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
               {t("ctaList")}

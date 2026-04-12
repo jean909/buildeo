@@ -8,6 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/suche",
     "/merkliste",
     "/anfragen",
+    "/inserat/neu",
     "/anmelden",
     "/registrieren",
     "/anbieterliste",
