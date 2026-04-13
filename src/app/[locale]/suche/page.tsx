@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { ListingCard } from "@/components/listing/listing-card";
 import { listListings } from "@/lib/listings-repo";
 import { parseSearchFilters } from "@/lib/filter-listings";
+import type { Listing } from "@/types/listing";
 import { SearchToolbar } from "./components/search-toolbar";
 import { SearchMapPanel } from "./components/search-map-panel";
 import { SuchauftragTeaser } from "./components/suchauftrag-teaser";
@@ -21,7 +22,14 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const filters = parseSearchFilters(sp);
 
-  const results = await listListings(filters);
+  let results: Listing[] = [];
+  let dbUnavailable = false;
+  try {
+    results = await listListings(filters);
+  } catch {
+    dbUnavailable = true;
+  }
+
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? null;
 
   const pins: MapPin[] = results
@@ -76,8 +84,15 @@ export default async function SearchPage({ params, searchParams }: Props) {
           </div>
 
           {results.length === 0 ? (
-            <p className="mt-8 rounded-xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-600 shadow-[var(--shadow-bd-card)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              {t("resultsEmpty")}
+            <p
+              role={dbUnavailable ? "alert" : undefined}
+              className={
+                dbUnavailable
+                  ? "mt-8 rounded-xl border border-amber-200 bg-amber-50 p-10 text-center text-sm text-amber-950 shadow-[var(--shadow-bd-card)] dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100"
+                  : "mt-8 rounded-xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-600 shadow-[var(--shadow-bd-card)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
+              }
+            >
+              {dbUnavailable ? t("dbUnavailable") : t("resultsEmpty")}
             </p>
           ) : (
             <ul className="mt-8 grid max-w-2xl gap-6 sm:grid-cols-1 lg:max-w-none xl:max-w-4xl xl:grid-cols-2">
