@@ -25,11 +25,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
 
-  await prisma.searchAlertSignup.upsert({
-    where: { email },
-    create: { email, filtersQuery: filtersQuery || null },
-    update: { filtersQuery: filtersQuery || null },
-  });
+  try {
+    await prisma.searchAlertSignup.upsert({
+      where: { email },
+      create: { email, filtersQuery: filtersQuery || null },
+      update: { filtersQuery: filtersQuery || null },
+    });
+  } catch {
+    return NextResponse.json({ error: "database_unavailable" }, { status: 503 });
+  }
 
   return NextResponse.json({ ok: true });
 }

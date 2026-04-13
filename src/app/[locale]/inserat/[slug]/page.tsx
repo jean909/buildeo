@@ -21,7 +21,12 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const listing = await getListingBySlug(slug);
+  let listing: Awaited<ReturnType<typeof getListingBySlug>>;
+  try {
+    listing = await getListingBySlug(slug);
+  } catch {
+    return { title: "Buildeo" };
+  }
   if (!listing) {
     return {};
   }
@@ -60,7 +65,18 @@ export default async function ListingPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const detail = await getListingDetailBySlug(slug);
+  let detail: Awaited<ReturnType<typeof getListingDetailBySlug>>;
+  try {
+    detail = await getListingDetailBySlug(slug);
+  } catch {
+    return (
+      <main className="mx-auto w-full max-w-lg flex-1 px-4 py-24 text-center">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">
+          Inserat-Datenbank momentan nicht erreichbar. Bitte später erneut versuchen.
+        </p>
+      </main>
+    );
+  }
   if (!detail) {
     notFound();
   }
