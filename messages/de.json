@@ -159,7 +159,6 @@
     "submitSearch": "Suchen",
     "filterSheetHint": "Preis, Zimmer, Fläche und mehr im Filter-Dialog – ohne zweite Leiste.",
     "resultsCount": "{count} Inserate",
-    "dbUnavailable": "Die Inserate-Datenbank ist momentan nicht erreichbar. Bitte später erneut versuchen. (Für Betrieb: DATABASE_URL / Pooling prüfen.)",
     "resultsEmpty": "Keine Treffer – Filter oder Suchbegriff anpassen.",
     "mapHint": "Rechts (Desktop) siehst du die Karte mit allen Treffern, sofern Mapbox aktiv ist.",
     "sortLabel": "Sortierung",

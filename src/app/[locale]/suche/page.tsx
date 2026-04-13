@@ -92,7 +92,9 @@ export default async function SearchPage({ params, searchParams }: Props) {
                   : "mt-8 rounded-xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-600 shadow-[var(--shadow-bd-card)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
               }
             >
-              {dbUnavailable ? t("dbUnavailable") : t("resultsEmpty")}
+              {dbUnavailable
+                ? "Die Inserate-Datenbank ist momentan nicht erreichbar. Bitte später erneut versuchen."
+                : t("resultsEmpty")}
             </p>
           ) : (
             <ul className="mt-8 grid max-w-2xl gap-6 sm:grid-cols-1 lg:max-w-none xl:max-w-4xl xl:grid-cols-2">
