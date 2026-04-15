@@ -18,15 +18,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "E-Mail und Passwort (min. 8 Zeichen) erforderlich" }, { status: 400 });
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return NextResponse.json({ error: "E-Mail bereits registriert" }, { status: 409 });
-  }
+  try {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return NextResponse.json({ error: "E-Mail bereits registriert" }, { status: 409 });
+    }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  await prisma.user.create({
-    data: { email, name, passwordHash },
-  });
+    const passwordHash = await bcrypt.hash(password, 12);
+    await prisma.user.create({
+      data: { email, name, passwordHash },
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "Datenbank momentan nicht erreichbar. Bitte später erneut versuchen." },
+      { status: 503 },
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }
