@@ -1,11 +1,13 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useTranslations } from "next-intl";
 
 type Props = {
   variant?: "compact" | "tall";
 };
 
-export async function MapPlaceholder({ variant = "tall" }: Props) {
-  const t = await getTranslations("search");
+export function MapPlaceholder({ variant = "tall" }: Props) {
+  const t = useTranslations("search");
 
   const height =
     variant === "compact" ? "min-h-[200px] max-h-[220px]" : "min-h-[320px] lg:min-h-0 lg:h-full";
