@@ -1,12 +1,16 @@
 import type { MetadataRoute } from "next";
 import { getAllListingSlugs } from "@/lib/listings-repo";
 import { shouldSkipOptionalDbReadsDuringPrerender } from "@/lib/is-next-build-phase";
+import { getSeoSitemapSlice, getTotalSeoPagesCount } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://buildeo.de").replace(/\/$/, "");
+  const now = new Date();
+
   const staticPaths = [
     "",
     "/suche",
+    "/staedte",
     "/merkliste",
     "/anfragen",
     "/inserat/neu",
@@ -20,9 +24,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const entries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
     url: path === "" ? base : `${base}${path}`,
-    lastModified: new Date(),
-    changeFrequency: path === "/suche" ? "hourly" : "weekly",
-    priority: path === "" ? 1 : 0.7,
+    lastModified: now,
+    changeFrequency: path === "/suche" || path === "/staedte" ? "daily" : "weekly",
+    priority: path === "" ? 1 : path === "/staedte" ? 0.9 : 0.7,
   }));
 
   let slugs: string[] = [];
@@ -36,9 +40,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of slugs) {
     entries.push({
       url: `${base}/inserat/${slug}`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: "daily",
       priority: 0.8,
+    });
+  }
+
+  // Programmatic SEO pages (Cities + Districts × Intents, capped safely below Google's 50k per-sitemap limit)
+  const { totalPagesCount } = getTotalSeoPagesCount();
+  const maxSeoEntries = Math.min(totalPagesCount, 48000);
+  const seoEntries = getSeoSitemapSlice(0, maxSeoEntries);
+
+  for (const item of seoEntries) {
+    entries.push({
+      url: `${base}/${item.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: item.priority,
     });
   }
 
